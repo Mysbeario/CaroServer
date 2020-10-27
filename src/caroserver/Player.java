@@ -24,6 +24,19 @@ public class Player implements Runnable {
     private String request;
     private Room room;
     private String id;
+    
+    private class OnRegister implements Command {
+        public void execute(String data) {
+            String[] parts = data.split(";");
+            String email = parts[0];
+            String password = parts[1];
+            String fullname = parts[2];
+            String gender = parts[3];
+            String birthday = parts[4];
+            
+            System.out.println(String.join(",", email, password, fullname, gender, birthday));
+        }
+    }
 
     private class OnNewMove implements Command {
         public void execute(String data) {
@@ -79,6 +92,7 @@ public class Player implements Runnable {
             while (true) {
                 request = in.readLine();
                 on("MOV", new OnNewMove());
+                on("REG", new OnRegister());
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
