@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import caroserver.thread.AccountThread;
+
 /**
  *
  * @author phandungtri
@@ -35,6 +37,7 @@ public class Server {
         System.out.println("Server is waiting for client...");
         while (true) {
             Socket socket = server.accept();
+            executor.execute(new AccountThread(socket));
             Player player = new Player(socket);
             room.addPlayer(player);
             executor.execute(player);
