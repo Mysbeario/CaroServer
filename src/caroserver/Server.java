@@ -5,6 +5,7 @@
  */
 package caroserver;
 
+import caroserver.model.Account;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import caroserver.thread.AccountThread;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,6 +23,7 @@ public class Server {
     private ExecutorService executor;
     private ServerSocket server;
     private Room room;
+    private ArrayList<Account> activeAccounts = new ArrayList<Account>();
 
     public Server(int port) {
         try {
@@ -37,10 +40,14 @@ public class Server {
         System.out.println("Server is waiting for client...");
         while (true) {
             Socket socket = server.accept();
-            executor.execute(new AccountThread(socket));
+            executor.execute(new AccountThread(socket, this));
             Player player = new Player(socket);
             room.addPlayer(player);
             executor.execute(player);
         }
+    }
+
+    public void logAccountIn(Account account) {
+        activeAccounts.add(account);
     }
 }

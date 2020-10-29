@@ -1,62 +1,83 @@
 package caroserver.thread;
 
+import caroserver.Server;
 import java.net.Socket;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import caroserver.bll.AccountBLL;
 import caroserver.model.Account;
+import java.sql.SQLException;
 
 public class AccountThread extends ClientThread {
-	public AccountThread(Socket socket) {
-		super(socket);
-	}
 
-	private String hashPassword(String password) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		byte[] messageDigest = md.digest(password.getBytes());
-		StringBuffer sb = new StringBuffer();
+    private final Server server;
 
-		for (int i = 0; i < messageDigest.length; i++) {
-			sb.append(Integer.toString((messageDigest[i] & 0xff) + 0x100, 16).substring(1));
-		}
+    public AccountThread(Socket socket, Server server) {
+        super(socket);
+        this.server = server;
+    }
 
-		return sb.toString();
-	}
+    private void registerAccount(String[] data) {
+        AccountBLL service = new AccountBLL();
+        String email = data[0];
+        String password = data[1];
+        String fullname = data[2];
+        int gender = Integer.parseInt(data[3]);
+        String birthday = data[4];
+        if (service.existEmail(email)) {
+            response("REG_ERR:Duplicated email!");
+        } else {
+            Account account = new Account(email, password, fullname, gender, birthday);
+            String error = service.create(account);
 
-	private void registerAccount(String[] data) {
-		try {
-			AccountBLL service = new AccountBLL();
-			String email = data[0];
-			String password = data[1];
-			String fullname = data[2];
-			int gender = Integer.parseInt(data[3]);
-			String birthday = data[4];
+            if (error.equals("")) {
+                response("REG_OK:ok");
+            } else {
+                response("REG_ERR:" + error);
+            }
+        }
+    }
 
-			if (service.existEmail(email)) {
-				response("REG_ERR:Duplicated email!");
-			} else {
-				Account account = new Account(email, hashPassword(password), fullname, gender, birthday);
-				String error = service.create(account);
+    private void login(String[] data) {
+        AccountBLL service = new AccountBLL();
+        String email = data[0];
+        String password = data[1];
 
-				if (error.equals("")) {
-					response("REG_OK");
-				} else {
-					response("REG_ERR:" + error);
-				}
-			}
-		} catch (NoSuchAlgorithmException e) {
-			System.err.println(e.getMessage());
-		}
-	}
+        System.out.println(String.join("-", email, password));
 
-	@Override
-	protected void handleRequest(String command, String[] data) {
-		switch (command) {
-			case "REG": {
-				registerAccount(data);
-				break;
-			}
-		}
-	}
+        if (!service.existEmail(email)) {
+            response("LOGIN_ERR:Email not found!");
+        } else {
+            try {
+                Account account = service.getByEmail(email);
+
+                try {
+                    if (!account.getPassword().equals(service.hashPassword(password))) {
+                        response("LOGIN_ERR:Login Failed");
+                    } else {
+                        server.logAccountIn(account);
+                        response("LOGIN_OK:ok");
+                    }
+                } catch (NoSuchAlgorithmException e) {
+                    response("LOGIN_ERR:Server failed!");
+                }
+            } catch (SQLException e) {
+                response("LOGIN_ERR:Server failed!");
+            }
+        }
+    }
+
+    @Override
+    protected void handleRequest(String command, String[] data) {
+        switch (command) {
+            case "REG": {
+                registerAccount(data);
+                break;
+            }
+            case "LOGIN": {
+                login(data);
+                break;
+            }
+        }
+    }
 }
