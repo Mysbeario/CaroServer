@@ -69,4 +69,8 @@ public class Account {
 	public void setBirthday(String birthday) {
 		this.birthday = birthday;
 	}
+
+	public String toString() {
+		return String.join(";", getId(), getEmail(), getFullname(), Integer.toString(getGender()), getBirthday());
+	}
 }

@@ -31,7 +31,7 @@ public class AccountThread extends ClientThread {
             String error = service.create(account);
 
             if (error.equals("")) {
-                response("REG_OK:ok");
+                response("REG_OK:Created!");
             } else {
                 response("REG_ERR:" + error);
             }
@@ -46,7 +46,7 @@ public class AccountThread extends ClientThread {
         System.out.println(String.join("-", email, password));
 
         if (!service.existEmail(email)) {
-            response("LOGIN_ERR:Email not found!");
+            response("LOGIN_ERR:Login Failed");
         } else {
             try {
                 Account account = service.getByEmail(email);
@@ -56,7 +56,7 @@ public class AccountThread extends ClientThread {
                         response("LOGIN_ERR:Login Failed");
                     } else {
                         server.logAccountIn(account);
-                        response("LOGIN_OK:ok");
+                        response("LOGIN_OK:" + account.toString());
                     }
                 } catch (NoSuchAlgorithmException e) {
                     response("LOGIN_ERR:Server failed!");
