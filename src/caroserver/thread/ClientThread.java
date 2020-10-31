@@ -6,13 +6,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
-public abstract class ClientThread implements Runnable {
-	protected Socket socket;
-	protected BufferedWriter out;
-	protected BufferedReader in;
+import caroserver.handler.HandlerBase;
 
-	protected ClientThread(Socket socket) {
+public class ClientThread implements Runnable {
+	private Socket socket;
+	private BufferedWriter out;
+	private BufferedReader in;
+	private ArrayList<HandlerBase> handlers = new ArrayList<>();
+
+	public ClientThread(Socket socket) {
 		this.socket = socket;
 
 		try {
@@ -23,8 +27,6 @@ public abstract class ClientThread implements Runnable {
 		}
 	}
 
-	protected abstract void handleRequest(String command, String[] data);
-
 	public void response(String res) {
 		try {
 			out.write(res + "\n");
@@ -32,6 +34,11 @@ public abstract class ClientThread implements Runnable {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
+	}
+
+	public void registerHandler(HandlerBase handler) {
+		handler.setThread(this);
+		handlers.add(handler);
 	}
 
 	@Override
@@ -42,7 +49,9 @@ public abstract class ClientThread implements Runnable {
 				String[] parts = request.split(":");
 				String[] data = parts[1].split(";");
 
-				handleRequest(parts[0], data);
+				for (HandlerBase handler : handlers) {
+					handler.handleRequest(parts[0], data);
+				}
 			}
 		} catch (IOException e) {
 			System.err.println(e.getMessage());

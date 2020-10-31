@@ -1,19 +1,20 @@
-package caroserver.thread;
+package caroserver.handler;
 
 import caroserver.Server;
-import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 
 import caroserver.bll.AccountBLL;
 import caroserver.model.Account;
+import caroserver.model.MatchMaker;
+import javafx.util.Pair;
+
 import java.sql.SQLException;
 
-public class AccountThread extends ClientThread {
+public class AccountHandler extends HandlerBase {
 
     private final Server server;
 
-    public AccountThread(Socket socket, Server server) {
-        super(socket);
+    public AccountHandler(Server server) {
         this.server = server;
     }
 
@@ -25,15 +26,15 @@ public class AccountThread extends ClientThread {
         int gender = Integer.parseInt(data[3]);
         String birthday = data[4];
         if (service.existEmail(email)) {
-            response("REG_ERR:Duplicated email!");
+            thread.response("REG_ERR:Duplicated email!");
         } else {
             Account account = new Account(email, password, fullname, gender, birthday);
             String error = service.create(account);
 
             if (error.equals("")) {
-                response("REG_OK:Created!");
+                thread.response("REG_OK:Created!");
             } else {
-                response("REG_ERR:" + error);
+                thread.response("REG_ERR:" + error);
             }
         }
     }
@@ -46,29 +47,34 @@ public class AccountThread extends ClientThread {
         System.out.println(String.join("-", email, password));
 
         if (!service.existEmail(email)) {
-            response("LOGIN_ERR:Login Failed");
+            thread.response("LOGIN_ERR:Login Failed");
         } else {
             try {
                 Account account = service.getByEmail(email);
 
                 try {
                     if (!account.getPassword().equals(service.hashPassword(password))) {
-                        response("LOGIN_ERR:Login Failed");
+                        thread.response("LOGIN_ERR:Login Failed");
                     } else {
-                        server.logAccountIn(account);
-                        response("LOGIN_OK:" + account.toString());
+                        thread.response("LOGIN_OK:" + account.toString());
+                        if (server.getActiveAccounts().isEmpty()) {
+                            server.queueAccount(thread, account);
+                        } else {
+                            MatchMaker mm = new MatchMaker(new Pair<>(thread, account),
+                                    server.getActiveAccounts().poll());
+                        }
                     }
                 } catch (NoSuchAlgorithmException e) {
-                    response("LOGIN_ERR:Server failed!");
+                    thread.response("LOGIN_ERR:Server failed!");
                 }
             } catch (SQLException e) {
-                response("LOGIN_ERR:Server failed!");
+                thread.response("LOGIN_ERR:Server failed!");
             }
         }
     }
 
     @Override
-    protected void handleRequest(String command, String[] data) {
+    public void handleRequest(String command, String[] data) {
         switch (command) {
             case "REG": {
                 registerAccount(data);
