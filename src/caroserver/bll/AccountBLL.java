@@ -24,7 +24,7 @@ public class AccountBLL {
 
         return sb.toString();
     }
-    
+
     private String validate(Account account) {
         Pattern emailPattern = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
         Pattern passwordPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
@@ -69,27 +69,11 @@ public class AccountBLL {
         return error;
     }
 
-    public boolean existEmail(String email) {
-        try {
-            for (Account acc : AccountDAL.read()) {
-                if (acc.getEmail().equals(email)) {
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return false;
+    public Account getByEmail(String email) throws SQLException {
+        return AccountDAL.readByEmail(email);
     }
 
-    public Account getByEmail(String email) throws SQLException {
-        for (Account acc : AccountDAL.read()) {
-            if (acc.getEmail().equals(email)) {
-                return acc;
-            }
-        }
-        
-        return null;
+    public Account getById(String id) throws SQLException {
+        return AccountDAL.readById(id);
     }
 }

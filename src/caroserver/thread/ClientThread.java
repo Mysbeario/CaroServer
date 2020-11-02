@@ -7,14 +7,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import caroserver.handler.HandlerBase;
+import caroserver.model.Account;
+import javafx.util.Pair;
 
 public class ClientThread implements Runnable {
 	private Socket socket;
 	private BufferedWriter out;
 	private BufferedReader in;
 	private ArrayList<HandlerBase> handlers = new ArrayList<>();
+	private ArrayList<HandlerBase> toRemove = new ArrayList<>();
+	private ArrayList<HandlerBase> toAdd = new ArrayList<>();
+	private Account account;
 
 	public ClientThread(Socket socket) {
 		this.socket = socket;
@@ -38,13 +42,20 @@ public class ClientThread implements Runnable {
 
 	public void registerHandler(HandlerBase handler) {
 		handler.setThread(this);
-		handlers.add(handler);
+		toAdd.add(handler);
+	}
+
+	public void unregisterHandler(HandlerBase handler) {
+		toRemove.add(handler);
 	}
 
 	@Override
 	public void run() {
 		try {
 			while (true) {
+				handlers.addAll(toAdd);
+				toAdd.clear();
+
 				String request = in.readLine();
 				String[] parts = request.split(":");
 				String[] data = parts[1].split(";");
@@ -52,9 +63,28 @@ public class ClientThread implements Runnable {
 				for (HandlerBase handler : handlers) {
 					handler.handleRequest(parts[0], data);
 				}
+
+				handlers.removeAll(toRemove);
+				toRemove.clear();
 			}
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public Pair<String, String[]> getRequest() throws IOException {
+		String request = in.readLine();
+		String[] parts = request.split(":");
+		String[] data = parts[1].split(";");
+
+		return new Pair<>(parts[0], data);
 	}
 }

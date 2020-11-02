@@ -15,7 +15,8 @@ public class CaroServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Server server = new Server(3000);
+        Server.setPort(3000);
+        Server.start();
     }
 
 }
