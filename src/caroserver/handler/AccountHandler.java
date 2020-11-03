@@ -3,8 +3,9 @@ package caroserver.handler;
 import caroserver.Server;
 import java.security.NoSuchAlgorithmException;
 import caroserver.bll.AccountBLL;
+import caroserver.component.MatchMaker;
 import caroserver.model.Account;
-import caroserver.thread.MatchMaker;
+
 import java.sql.SQLException;
 
 public class AccountHandler extends HandlerBase {
@@ -64,7 +65,7 @@ public class AccountHandler extends HandlerBase {
 
     private void readyAccount(String[] data) {
         if (!Server.isQueueEmpty()) {
-            MatchMaker mm = new MatchMaker(thread, Server.dequeueAccount());
+            new MatchMaker(thread, Server.dequeueAccount());
         } else {
             Server.queueAccount(thread);
         }

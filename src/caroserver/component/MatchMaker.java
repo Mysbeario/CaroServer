@@ -1,7 +1,9 @@
-package caroserver.thread;
+package caroserver.component;
 
 import java.util.ArrayList;
+
 import caroserver.handler.MatchMakingHandler;
+import caroserver.thread.ClientThread;
 
 public class MatchMaker {
 	private ClientThread[] pair = new ClientThread[2];
@@ -41,6 +43,8 @@ public class MatchMaker {
 			for (ClientThread acc : pair) {
 				acc.response("MMK_NEW:New match");
 			}
+
+			new Game(pair);
 		}
 	}
 }

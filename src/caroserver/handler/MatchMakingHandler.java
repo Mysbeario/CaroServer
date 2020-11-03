@@ -1,6 +1,6 @@
 package caroserver.handler;
 
-import caroserver.thread.MatchMaker;
+import caroserver.component.MatchMaker;
 
 public class MatchMakingHandler extends HandlerBase {
 	private MatchMaker matchMaker;
