@@ -1,8 +1,11 @@
 package caroserver.component;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
+import caroserver.bll.AccountBLL;
 import caroserver.handler.GameHandler;
+import caroserver.model.Account;
 import caroserver.thread.ClientThread;
 
 public class Game {
@@ -123,6 +126,28 @@ public class Game {
 	public void sendAll(String data) {
 		for (ClientThread p : players) {
 			p.response(data);
+		}
+	}
+
+	public void calculateScore() {
+		try {
+			AccountBLL service = new AccountBLL();
+
+			for (ClientThread p : players) {
+				Account account = p.getAccount();
+
+				if (getCurrentPlayerId().equals(account.getId())) {
+					account.setScore(account.getScore() + 3);
+					account.setWin(account.getWin() + 1);
+				} else {
+					account.setScore(account.getScore() - 1);
+					account.setLose(account.getLose() + 1);
+				}
+
+				service.update(account);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 

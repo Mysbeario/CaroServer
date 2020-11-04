@@ -16,7 +16,7 @@ public class MatchMaker {
 
 		for (ClientThread acc : pair) {
 			acc.registerHandler(new MatchMakingHandler(this));
-			acc.response("MMK:Match found!");
+			acc.response("MATCHMAKING:Match found");
 		}
 	}
 
@@ -33,7 +33,7 @@ public class MatchMaker {
 			for (boolean isAccepted : acceptStatus) {
 				if (!isAccepted) {
 					for (ClientThread acc : pair) {
-						acc.response("MMK_BCK:Back to queue");
+						acc.response("BACK_TO_QUEUE:Back to queue");
 					}
 
 					return;
@@ -41,7 +41,7 @@ public class MatchMaker {
 			}
 
 			for (ClientThread acc : pair) {
-				acc.response("MMK_NEW:New match");
+				acc.response("NEW_MATCH:New match");
 			}
 
 			new Game(pair);

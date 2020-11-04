@@ -9,8 +9,6 @@ import caroserver.dal.AccountDAL;
 import caroserver.model.Account;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AccountBLL {
     public String hashPassword(String password) throws NoSuchAlgorithmException {
@@ -62,7 +60,7 @@ public class AccountBLL {
                 account.setPassword(hashPassword(account.getPassword()));
                 AccountDAL.create(account);
             } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger(AccountBLL.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
 
@@ -75,5 +73,9 @@ public class AccountBLL {
 
     public Account getById(String id) throws SQLException {
         return AccountDAL.readById(id);
+    }
+
+    public void update(Account account) throws SQLException {
+        AccountDAL.update(account);
     }
 }

@@ -19,15 +19,15 @@ public class AccountHandler extends HandlerBase {
             int gender = Integer.parseInt(data[3]);
             String birthday = data[4];
             if (service.getByEmail(email) != null) {
-                thread.response("REG_ERR:Duplicated email!");
+                thread.response("REGISTER_ERROR:Duplicated email!");
             } else {
                 Account account = new Account(email, password, fullname, gender, birthday);
                 String error = service.create(account);
 
                 if (error.equals("")) {
-                    thread.response("REG_OK:Created!");
+                    thread.response("REGISTER_OK:Created!");
                 } else {
-                    thread.response("REG_ERR:" + error);
+                    thread.response("REGISTER_ERROR:" + error);
                 }
             }
         } catch (SQLException e) {
@@ -42,24 +42,24 @@ public class AccountHandler extends HandlerBase {
             String password = data[1];
 
             if (service.getByEmail(email) == null) {
-                thread.response("LOGIN_ERR:Login Failed");
+                thread.response("LOGIN_ERROR:Login Failed");
             } else {
                 Account account = service.getByEmail(email);
 
                 try {
                     if (!account.getPassword().equals(service.hashPassword(password))) {
-                        thread.response("LOGIN_ERR:Login Failed");
+                        thread.response("LOGIN_ERROR:Login Failed");
                     } else {
                         thread.setAccount(account);
                         thread.response("LOGIN_OK:" + account.toString());
                     }
                 } catch (NoSuchAlgorithmException e) {
-                    thread.response("LOGIN_ERR:Server failed!");
+                    thread.response("LOGIN_ERROR:Server failed!");
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            thread.response("LOGIN_ERR:Server failed!");
+            thread.response("LOGIN_ERROR:Server failed!");
         }
     }
 
@@ -74,7 +74,7 @@ public class AccountHandler extends HandlerBase {
     @Override
     public void handleRequest(String command, String[] data) {
         switch (command) {
-            case "REG": {
+            case "REGISTER": {
                 registerAccount(data);
                 break;
             }
@@ -82,7 +82,7 @@ public class AccountHandler extends HandlerBase {
                 login(data);
                 break;
             }
-            case "RDY": {
+            case "READY": {
                 readyAccount(data);
                 break;
             }

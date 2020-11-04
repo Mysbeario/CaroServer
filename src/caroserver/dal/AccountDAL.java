@@ -19,6 +19,10 @@ public class AccountDAL {
 		acc.setFullname(result.getString("fullname"));
 		acc.setGender(result.getInt("gender"));
 		acc.setBirthday(result.getString("birthday"));
+		acc.setScore(result.getInt("score"));
+		acc.setWin(result.getInt("win"));
+		acc.setLose(result.getInt("lose"));
+		acc.setTie(result.getInt("tie"));
 
 		return acc;
 	}
@@ -26,7 +30,7 @@ public class AccountDAL {
 	public static void create(Account account) {
 		try {
 			Connection conn = Database.connect();
-			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday) VALUES(?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score, win, lose, tie) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, account.getId());
@@ -35,6 +39,10 @@ public class AccountDAL {
 			stmt.setString(4, account.getFullname());
 			stmt.setInt(5, account.getGender());
 			stmt.setString(6, account.getBirthday());
+			stmt.setInt(7, account.getScore());
+			stmt.setInt(8, account.getWin());
+			stmt.setInt(9, account.getLose());
+			stmt.setInt(10, account.getTie());
 
 			stmt.executeUpdate();
 			conn.close();
@@ -60,6 +68,7 @@ public class AccountDAL {
 
 	public static Account readById(String id) throws SQLException {
 		Connection conn = Database.connect();
+		Account account = null;
 		String query = "SELECT * FROM account WHERE id = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
@@ -68,14 +77,16 @@ public class AccountDAL {
 		ResultSet result = stmt.executeQuery();
 
 		if (result.next()) {
-			return extract(result);
+			account = extract(result);
 		}
 
-		return null;
+		conn.close();
+		return account;
 	}
 
 	public static Account readByEmail(String email) throws SQLException {
 		Connection conn = Database.connect();
+		Account account = null;
 		String query = "SELECT * FROM account WHERE email = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
@@ -84,9 +95,30 @@ public class AccountDAL {
 		ResultSet result = stmt.executeQuery();
 
 		if (result.next()) {
-			return extract(result);
+			account = extract(result);
 		}
 
-		return null;
+		conn.close();
+		return account;
+	}
+
+	public static void update(Account account) throws SQLException {
+		Connection conn = Database.connect();
+		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ?, win = ?, lose = ?, tie = ? WHERE id = ?";
+		PreparedStatement stmt = conn.prepareStatement(query);
+
+		stmt.setString(10, account.getId());
+		stmt.setString(1, account.getEmail());
+		stmt.setString(2, account.getPassword());
+		stmt.setString(3, account.getFullname());
+		stmt.setInt(4, account.getGender());
+		stmt.setString(5, account.getBirthday());
+		stmt.setInt(6, account.getScore());
+		stmt.setInt(7, account.getWin());
+		stmt.setInt(8, account.getLose());
+		stmt.setInt(9, account.getTie());
+
+		stmt.executeUpdate();
+		conn.close();
 	}
 }
