@@ -12,6 +12,7 @@ public class Game {
 	private ClientThread[] players = new ClientThread[2];
 	private String[][] board = new String[15][15];
 	private int currentPlayer = 0;
+	private Thread turnTimer;
 
 	public Game(ClientThread[] players) {
 		this.players = players;
@@ -27,6 +28,16 @@ public class Game {
 
 	public String getCurrentPlayerId() {
 		return players[currentPlayer].getAccount().getId();
+	}
+
+	public void startTimer() {
+		turnTimer = new Thread(() -> {
+			try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	public boolean newMove(int col, int row, String fromPlayer) {

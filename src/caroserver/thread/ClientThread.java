@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import caroserver.handler.HandlerBase;
 import caroserver.model.Account;
-import javafx.util.Pair;
 
 public class ClientThread implements Runnable {
 	private Socket socket;
@@ -78,13 +77,5 @@ public class ClientThread implements Runnable {
 
 	public Account getAccount() {
 		return account;
-	}
-
-	public Pair<String, String[]> getRequest() throws IOException {
-		String request = in.readLine();
-		String[] parts = request.split(":");
-		String[] data = parts[1].split(";");
-
-		return new Pair<>(parts[0], data);
 	}
 }
