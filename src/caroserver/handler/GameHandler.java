@@ -22,10 +22,9 @@ public class GameHandler extends HandlerBase {
 
 					if (game.isWinning(col, row)) {
 						thread.unregisterHandler(this);
-						game.calculateScore();
-						game.sendAll("GAMEOVER:" + game.getCurrentPlayerId());
+						game.gameOver();
 					} else {
-						game.nextTurn();
+						game.resetTimer();
 					}
 				}
 

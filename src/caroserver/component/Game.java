@@ -24,20 +24,34 @@ public class Game {
 		for (String[] row : board) {
 			Arrays.fill(row, "");
 		}
+
+		startTimer();
+	}
+
+	private void nextTurn() {
+		currentPlayer = (currentPlayer + 1) % 2;
+	}
+
+	private void startTimer() {
+		turnTimer = new Thread(() -> {
+			try {
+				Thread.sleep(30000);
+				nextTurn();
+				gameOver();
+			} catch (InterruptedException e) {
+				nextTurn();
+			}
+		});
+		turnTimer.start();
 	}
 
 	public String getCurrentPlayerId() {
 		return players[currentPlayer].getAccount().getId();
 	}
 
-	public void startTimer() {
-		turnTimer = new Thread(() -> {
-			try {
-				Thread.sleep(30000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
+	public void resetTimer() {
+		turnTimer.interrupt();
+		startTimer();
 	}
 
 	public boolean newMove(int col, int row, String fromPlayer) {
@@ -45,6 +59,7 @@ public class Game {
 			System.out.println("Cell filled");
 			return false;
 		}
+
 		board[row][col] = fromPlayer;
 		return true;
 	}
@@ -162,7 +177,8 @@ public class Game {
 		}
 	}
 
-	public void nextTurn() {
-		currentPlayer = (currentPlayer + 1) % 2;
+	public void gameOver() {
+		calculateScore();
+		sendAll("GAMEOVER:" + getCurrentPlayerId());
 	}
 }
