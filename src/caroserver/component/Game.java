@@ -13,6 +13,8 @@ public class Game {
 	private String[][] board = new String[15][15];
 	private int currentPlayer = 0;
 	private Thread turnTimer;
+	private Thread gameTimer;
+	private boolean isDraw = false;
 
 	public Game(ClientThread[] players) {
 		this.players = players;
@@ -25,14 +27,30 @@ public class Game {
 			Arrays.fill(row, "");
 		}
 
-		startTimer();
+		startGameTimer();
+		startTurnTimer();
+	}
+
+	private void startGameTimer() {
+		int duration = 10 * 60 * 1000;
+
+		gameTimer = new Thread(() -> {
+			try {
+				Thread.sleep(duration);
+				isDraw = true;
+				gameOver();
+			} catch (InterruptedException e) {
+			}
+		});
+
+		gameTimer.start();
 	}
 
 	private void nextTurn() {
 		currentPlayer = (currentPlayer + 1) % 2;
 	}
 
-	private void startTimer() {
+	private void startTurnTimer() {
 		turnTimer = new Thread(() -> {
 			try {
 				Thread.sleep(30000);
@@ -51,7 +69,7 @@ public class Game {
 
 	public void resetTimer() {
 		turnTimer.interrupt();
-		startTimer();
+		startTurnTimer();
 	}
 
 	public boolean newMove(int col, int row, String fromPlayer) {
@@ -162,7 +180,10 @@ public class Game {
 			for (ClientThread p : players) {
 				Account account = p.getAccount();
 
-				if (getCurrentPlayerId().equals(account.getId())) {
+				if (isDraw) {
+					account.setScore(account.getScore() + 1);
+					account.setDraw(account.getDraw() + 1);
+				} else if (getCurrentPlayerId().equals(account.getId())) {
 					account.setScore(account.getScore() + 3);
 					account.setWin(account.getWin() + 1);
 				} else {
@@ -179,6 +200,8 @@ public class Game {
 
 	public void gameOver() {
 		calculateScore();
-		sendAll("GAMEOVER:" + getCurrentPlayerId());
+		sendAll("GAMEOVER:" + (isDraw ? "DRAW" : getCurrentPlayerId()));
+		turnTimer.interrupt();
+		gameTimer.interrupt();
 	}
 }

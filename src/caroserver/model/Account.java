@@ -12,13 +12,13 @@ public class Account {
 	private int score = 0;
 	private int win = 0;
 	private int lose = 0;
-	private int tie = 0;
+	private int draw = 0;
 
 	public Account() {
 	}
 
 	public Account(String email, String password, String fullname, int gender, String birthday, int score, int win,
-			int lose, int tie) {
+			int lose, int draw) {
 		id = UUID.randomUUID().toString();
 		this.email = email;
 		this.password = password;
@@ -28,7 +28,7 @@ public class Account {
 		this.score = score;
 		this.win = win;
 		this.lose = lose;
-		this.tie = tie;
+		this.draw = draw;
 	}
 
 	public Account(String email, String password, String fullname, int gender, String birthday) {
@@ -76,8 +76,8 @@ public class Account {
 		return lose;
 	}
 
-	public int getTie() {
-		return tie;
+	public int getDraw() {
+		return draw;
 	}
 
 	public void setId(String id) {
@@ -116,8 +116,8 @@ public class Account {
 		this.lose = lose;
 	}
 
-	public void setTie(int tie) {
-		this.tie = tie;
+	public void setDraw(int tie) {
+		this.draw = tie;
 	}
 
 	public String toString() {

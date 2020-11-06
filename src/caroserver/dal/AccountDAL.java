@@ -22,7 +22,7 @@ public class AccountDAL {
 		acc.setScore(result.getInt("score"));
 		acc.setWin(result.getInt("win"));
 		acc.setLose(result.getInt("lose"));
-		acc.setTie(result.getInt("tie"));
+		acc.setDraw(result.getInt("draw"));
 
 		return acc;
 	}
@@ -30,7 +30,7 @@ public class AccountDAL {
 	public static void create(Account account) {
 		try {
 			Connection conn = Database.connect();
-			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score, win, lose, tie) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score, win, lose, draw) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, account.getId());
@@ -42,7 +42,7 @@ public class AccountDAL {
 			stmt.setInt(7, account.getScore());
 			stmt.setInt(8, account.getWin());
 			stmt.setInt(9, account.getLose());
-			stmt.setInt(10, account.getTie());
+			stmt.setInt(10, account.getDraw());
 
 			stmt.executeUpdate();
 			conn.close();
@@ -104,7 +104,7 @@ public class AccountDAL {
 
 	public static void update(Account account) throws SQLException {
 		Connection conn = Database.connect();
-		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ?, win = ?, lose = ?, tie = ? WHERE id = ?";
+		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ?, win = ?, lose = ?, draw = ? WHERE id = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
 		stmt.setString(10, account.getId());
@@ -116,7 +116,7 @@ public class AccountDAL {
 		stmt.setInt(6, account.getScore());
 		stmt.setInt(7, account.getWin());
 		stmt.setInt(8, account.getLose());
-		stmt.setInt(9, account.getTie());
+		stmt.setInt(9, account.getDraw());
 
 		stmt.executeUpdate();
 		conn.close();
