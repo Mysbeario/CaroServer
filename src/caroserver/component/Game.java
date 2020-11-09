@@ -38,7 +38,7 @@ public class Game {
 			try {
 				Thread.sleep(duration);
 				isDraw = true;
-				gameOver();
+				gameOver(null);
 			} catch (InterruptedException e) {
 			}
 		});
@@ -46,7 +46,7 @@ public class Game {
 		gameTimer.start();
 	}
 
-	private void nextTurn() {
+	public void nextTurn() {
 		currentPlayer = (currentPlayer + 1) % 2;
 	}
 
@@ -55,9 +55,8 @@ public class Game {
 			try {
 				Thread.sleep(30000);
 				nextTurn();
-				gameOver();
+				gameOver(getCurrentPlayerId());
 			} catch (InterruptedException e) {
-				nextTurn();
 			}
 		});
 		turnTimer.start();
@@ -198,9 +197,9 @@ public class Game {
 		}
 	}
 
-	public void gameOver() {
+	public void gameOver(String winningPlayerId) {
 		calculateScore();
-		sendAll("GAMEOVER:" + (isDraw ? "DRAW" : getCurrentPlayerId()));
+		sendAll("GAMEOVER:" + (isDraw ? "DRAW" : winningPlayerId));
 		turnTimer.interrupt();
 		gameTimer.interrupt();
 	}

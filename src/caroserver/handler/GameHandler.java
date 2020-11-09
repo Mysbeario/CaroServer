@@ -18,13 +18,13 @@ public class GameHandler extends HandlerBase {
 				String fromPlayer = data[2];
 
 				if (game.getCurrentPlayerId().equals(fromPlayer) && game.newMove(col, row, fromPlayer)) {
-					game.sendAll(command + ":" + String.join(";", data));
+					game.nextTurn();
+					game.sendAll(command + ":" + String.join(";", data) + ";" + game.getCurrentPlayerId());
 
 					if (game.isWinning(col, row)) {
-						game.gameOver();
+						game.gameOver(fromPlayer);
 					} else {
 						game.resetTimer();
-						game.sendAll("NEW_TURN:" + game.getCurrentPlayerId());
 					}
 				}
 
