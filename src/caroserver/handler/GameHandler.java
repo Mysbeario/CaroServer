@@ -21,14 +21,17 @@ public class GameHandler extends HandlerBase {
 					game.sendAll(command + ":" + String.join(";", data));
 
 					if (game.isWinning(col, row)) {
-						thread.unregisterHandler(this);
 						game.gameOver();
 					} else {
 						game.resetTimer();
+						game.sendAll("NEW_TURN:" + game.getCurrentPlayerId());
 					}
 				}
 
 				break;
+			}
+			case "READY": {
+				thread.unregisterHandler(this);
 			}
 		}
 	}

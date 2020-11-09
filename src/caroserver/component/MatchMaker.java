@@ -28,6 +28,10 @@ public class MatchMaker {
 		acceptStatus.add(false);
 	}
 
+	private String getBriefInfo(ClientThread thread) {
+		return thread.getAccount().getId() + "," + thread.getAccount().getFullname();
+	}
+
 	public void checkMatch() {
 		if (acceptStatus.size() == 2) {
 			for (boolean isAccepted : acceptStatus) {
@@ -40,11 +44,11 @@ public class MatchMaker {
 				}
 			}
 
-			for (ClientThread acc : pair) {
-				acc.response("NEW_MATCH:New match");
-			}
+			Game game = new Game(pair);
+			String currentPlayerId = game.getCurrentPlayerId();
 
-			new Game(pair);
+			pair[0].response("NEW_MATCH:" + getBriefInfo(pair[1]) + ";" + currentPlayerId);
+			pair[1].response("NEW_MATCH:" + getBriefInfo(pair[0]) + ";" + currentPlayerId);
 		}
 	}
 }
