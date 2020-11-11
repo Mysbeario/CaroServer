@@ -1,8 +1,11 @@
 package caroserver.component;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
+import caroserver.Server;
 import caroserver.bll.AccountBLL;
 import caroserver.handler.GameHandler;
 import caroserver.model.Account;
@@ -10,11 +13,13 @@ import caroserver.thread.ClientThread;
 
 public class Game {
 	private ClientThread[] players = new ClientThread[2];
+	private ClientThread spectator;
 	private String[][] board = new String[15][15];
 	private int currentPlayer = 0;
 	private Thread turnTimer;
 	private Thread gameTimer;
 	private boolean isDraw = false;
+	private String id = UUID.randomUUID().toString();
 
 	public Game(ClientThread[] players) {
 		this.players = players;
@@ -46,6 +51,27 @@ public class Game {
 		gameTimer.start();
 	}
 
+	private String getPlayerInfo(ClientThread p) {
+		return p.getAccount().getId() + "," + p.getAccount().getFullname();
+	}
+
+	public void addSpectator(ClientThread spectator) {
+		String playerInfos = getPlayerInfo(players[0]) + ";" + getPlayerInfo(players[1]);
+		ArrayList<String> moveInfos = new ArrayList<>();
+
+		for (int i = 0; i < 15; i++) {
+			for (int j = 0; j < 15; j++) {
+				if (!board[i][j].equals("")) {
+					moveInfos.add(String.join(".", Integer.toString(j), Integer.toString(i), board[i][j]));
+				}
+			}
+		}
+
+		this.spectator = spectator;
+		this.spectator
+				.response("GAME_INFO:" + playerInfos + ";" + getCurrentPlayerId() + ";" + String.join(",", moveInfos));
+	}
+
 	public void nextTurn() {
 		currentPlayer = (currentPlayer + 1) % 2;
 	}
@@ -73,7 +99,6 @@ public class Game {
 
 	public boolean newMove(int col, int row, String fromPlayer) {
 		if (!board[row][col].equals("")) {
-			System.out.println("Cell filled");
 			return false;
 		}
 
@@ -170,6 +195,10 @@ public class Game {
 		for (ClientThread p : players) {
 			p.response(data);
 		}
+
+		if (spectator != null) {
+			spectator.response(data);
+		}
 	}
 
 	public void calculateScore() {
@@ -202,5 +231,21 @@ public class Game {
 		sendAll("GAMEOVER:" + (isDraw ? "DRAW" : winningPlayerId));
 		turnTimer.interrupt();
 		gameTimer.interrupt();
+
+		Server.removeGame(id);
+	}
+
+	public String[] getPlayerNames() {
+		String[] names = new String[2];
+
+		for (int i = 0; i < players.length; i++) {
+			names[i] = players[i].getAccount().getFullname();
+		}
+
+		return names;
+	}
+
+	public String getId() {
+		return id;
 	}
 }

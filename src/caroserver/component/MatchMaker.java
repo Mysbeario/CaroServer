@@ -2,6 +2,7 @@ package caroserver.component;
 
 import java.util.ArrayList;
 
+import caroserver.Server;
 import caroserver.handler.MatchMakingHandler;
 import caroserver.thread.ClientThread;
 
@@ -47,6 +48,7 @@ public class MatchMaker {
 			Game game = new Game(pair);
 			String currentPlayerId = game.getCurrentPlayerId();
 
+			Server.addGame(game);
 			pair[0].response("NEW_MATCH:" + getBriefInfo(pair[1]) + ";" + currentPlayerId);
 			pair[1].response("NEW_MATCH:" + getBriefInfo(pair[0]) + ";" + currentPlayerId);
 		}

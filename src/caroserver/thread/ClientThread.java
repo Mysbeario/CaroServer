@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import caroserver.Server;
 import caroserver.handler.HandlerBase;
 import caroserver.model.Account;
 
@@ -18,6 +20,7 @@ public class ClientThread implements Runnable {
 	private ArrayList<HandlerBase> toRemove = new ArrayList<>();
 	private ArrayList<HandlerBase> toAdd = new ArrayList<>();
 	private Account account;
+	private boolean isDisconnected = false;
 
 	public ClientThread(Socket socket) {
 		this.socket = socket;
@@ -51,13 +54,18 @@ public class ClientThread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			while (true) {
+			while (!isDisconnected) {
 				handlers.addAll(toAdd);
 				toAdd.clear();
 
 				String request = in.readLine();
 				String[] parts = request.split(":");
 				String[] data = parts[1].split(";");
+
+				if (parts[0].equals("DISCONNECT")) {
+					isDisconnected = true;
+					Server.disconnectClient(data[0]);
+				}
 
 				for (HandlerBase handler : handlers) {
 					handler.handleRequest(parts[0], data);
@@ -66,6 +74,10 @@ public class ClientThread implements Runnable {
 				handlers.removeAll(toRemove);
 				toRemove.clear();
 			}
+
+			socket.close();
+			out.close();
+			in.close();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}

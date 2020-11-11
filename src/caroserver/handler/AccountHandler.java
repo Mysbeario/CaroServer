@@ -7,6 +7,7 @@ import caroserver.component.MatchMaker;
 import caroserver.model.Account;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AccountHandler extends HandlerBase {
     private void registerAccount(String[] data) {
@@ -63,11 +64,21 @@ public class AccountHandler extends HandlerBase {
         }
     }
 
+    private void getGameList() {
+        ArrayList<String> gameInfos = new ArrayList<>();
+
+        Server.getGameList().forEach((k, v) -> {
+            gameInfos.add(k + "," + String.join(",", v.getPlayerNames()));
+        });
+        thread.response("GAME_LIST:" + (gameInfos.isEmpty() ? ";" : String.join(";", gameInfos)));
+    }
+
     private void readyAccount(String[] data) {
         if (!Server.isQueueEmpty()) {
             new MatchMaker(thread, Server.dequeueAccount());
         } else {
             Server.queueAccount(thread);
+            getGameList();
         }
     }
 
@@ -84,6 +95,14 @@ public class AccountHandler extends HandlerBase {
             }
             case "READY": {
                 readyAccount(data);
+                break;
+            }
+            case "SPECTATE": {
+                Server.getGameList().get(data[0]).addSpectator(thread);
+                break;
+            }
+            case "REFRESH": {
+                getGameList();
                 break;
             }
         }
