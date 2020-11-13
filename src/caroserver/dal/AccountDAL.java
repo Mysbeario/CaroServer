@@ -20,9 +20,6 @@ public class AccountDAL {
 		acc.setGender(result.getInt("gender"));
 		acc.setBirthday(result.getString("birthday"));
 		acc.setScore(result.getInt("score"));
-		acc.setWin(result.getInt("win"));
-		acc.setLose(result.getInt("lose"));
-		acc.setDraw(result.getInt("draw"));
 
 		return acc;
 	}
@@ -30,7 +27,7 @@ public class AccountDAL {
 	public static void create(Account account) {
 		try {
 			Connection conn = Database.connect();
-			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score, win, lose, draw) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, account.getId());
@@ -40,9 +37,6 @@ public class AccountDAL {
 			stmt.setInt(5, account.getGender());
 			stmt.setString(6, account.getBirthday());
 			stmt.setInt(7, account.getScore());
-			stmt.setInt(8, account.getWin());
-			stmt.setInt(9, account.getLose());
-			stmt.setInt(10, account.getDraw());
 
 			stmt.executeUpdate();
 			conn.close();
@@ -104,7 +98,7 @@ public class AccountDAL {
 
 	public static void update(Account account) throws SQLException {
 		Connection conn = Database.connect();
-		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ?, win = ?, lose = ?, draw = ? WHERE id = ?";
+		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ? WHERE id = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
 		stmt.setString(10, account.getId());
@@ -114,9 +108,6 @@ public class AccountDAL {
 		stmt.setInt(4, account.getGender());
 		stmt.setString(5, account.getBirthday());
 		stmt.setInt(6, account.getScore());
-		stmt.setInt(7, account.getWin());
-		stmt.setInt(8, account.getLose());
-		stmt.setInt(9, account.getDraw());
 
 		stmt.executeUpdate();
 		conn.close();

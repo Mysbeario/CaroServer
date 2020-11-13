@@ -7,8 +7,11 @@ import java.util.UUID;
 
 import caroserver.Server;
 import caroserver.bll.AccountBLL;
+import caroserver.bll.MatchHistoryBLL;
 import caroserver.handler.GameHandler;
 import caroserver.model.Account;
+import caroserver.model.MatchHistory;
+import caroserver.model.MatchHistory.MatchStatus;
 import caroserver.thread.ClientThread;
 
 public class Game {
@@ -203,23 +206,26 @@ public class Game {
 
 	public void calculateScore() {
 		try {
-			AccountBLL service = new AccountBLL();
+			MatchHistoryBLL historyService = new MatchHistoryBLL();
+			AccountBLL accountService = new AccountBLL();
 
 			for (ClientThread p : players) {
 				Account account = p.getAccount();
+				MatchHistory history = new MatchHistory(p.getAccount().getId());
 
 				if (isDraw) {
 					account.setScore(account.getScore() + 1);
-					account.setDraw(account.getDraw() + 1);
+					history.setStatus(MatchStatus.DRAW);
 				} else if (getCurrentPlayerId().equals(account.getId())) {
 					account.setScore(account.getScore() + 3);
-					account.setWin(account.getWin() + 1);
+					history.setStatus(MatchStatus.WIN);
 				} else {
 					account.setScore(account.getScore() - 1);
-					account.setLose(account.getLose() + 1);
+					history.setStatus(MatchStatus.LOSE);
 				}
 
-				service.update(account);
+				accountService.update(account);
+				historyService.create(history);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

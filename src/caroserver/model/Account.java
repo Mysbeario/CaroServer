@@ -10,25 +10,8 @@ public class Account {
 	private int gender;
 	private String birthday;
 	private int score = 0;
-	private int win = 0;
-	private int lose = 0;
-	private int draw = 0;
 
 	public Account() {
-	}
-
-	public Account(String email, String password, String fullname, int gender, String birthday, int score, int win,
-			int lose, int draw) {
-		id = UUID.randomUUID().toString();
-		this.email = email;
-		this.password = password;
-		this.fullname = fullname;
-		this.gender = gender;
-		this.birthday = birthday;
-		this.score = score;
-		this.win = win;
-		this.lose = lose;
-		this.draw = draw;
 	}
 
 	public Account(String email, String password, String fullname, int gender, String birthday) {
@@ -68,18 +51,6 @@ public class Account {
 		return score;
 	}
 
-	public int getWin() {
-		return win;
-	}
-
-	public int getLose() {
-		return lose;
-	}
-
-	public int getDraw() {
-		return draw;
-	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -106,18 +77,6 @@ public class Account {
 
 	public void setScore(int score) {
 		this.score = score < 0 ? 0 : score;
-	}
-
-	public void setWin(int win) {
-		this.win = win;
-	}
-
-	public void setLose(int lose) {
-		this.lose = lose;
-	}
-
-	public void setDraw(int tie) {
-		this.draw = tie;
 	}
 
 	public String toString() {
