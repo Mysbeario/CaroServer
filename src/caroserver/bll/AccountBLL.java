@@ -23,15 +23,12 @@ public class AccountBLL {
         return sb.toString();
     }
 
-    private String validate(Account account) {
+    public String validateInfo(Account account) {
         Pattern emailPattern = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-        Pattern passwordPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
         LocalDate currentDate = LocalDate.now();
 
         if (!emailPattern.matcher(account.getEmail()).find()) {
             return "Invalid email address!";
-        } else if (!passwordPattern.matcher(account.getPassword()).find()) {
-            return "Password must be from 8 characters,\nat least one uppercase letter, one lowercase letter and one number!";
         } else if (account.getFullname().equals("")) {
             return "Full name is required!";
         } else if (account.getGender() < 1 || account.getGender() > 3) {
@@ -52,8 +49,22 @@ public class AccountBLL {
         return "";
     }
 
+    public String validatePassword(String password) {
+        Pattern passwordPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
+
+        if (!passwordPattern.matcher(password).find()) {
+            return "Password must be from 8 characters,\nat least one uppercase letter, one lowercase letter and one number!";
+        }
+
+        return "";
+    }
+
     public String create(Account account) {
-        String error = validate(account);
+        String error = validateInfo(account);
+
+        if (error.equals("")) {
+            error = validatePassword(account.getPassword());
+        }
 
         if (error.equals("")) {
             try {

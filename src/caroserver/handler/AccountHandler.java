@@ -1,6 +1,7 @@
 package caroserver.handler;
 
 import caroserver.Server;
+
 import java.security.NoSuchAlgorithmException;
 import caroserver.bll.AccountBLL;
 import caroserver.bll.AchievementBLL;
@@ -95,6 +96,53 @@ public class AccountHandler extends HandlerBase {
         }
     }
 
+    private void changePassword(String[] data) {
+        try {
+            AccountBLL service = new AccountBLL();
+            String password = data[0];
+            String newPassword = data[1];
+            Account account = thread.getAccount();
+
+            try {
+                if (!account.getPassword().equals(service.hashPassword(password))) {
+                    thread.response("CHANGE_PASSWORD_ERROR:Wrong password!");
+                } else {
+                    account.setPassword(service.hashPassword(newPassword));
+                    service.update(account);
+                    thread.response("CHANGE_PASSWORD_OK:Password changed");
+                }
+            } catch (NoSuchAlgorithmException e) {
+                thread.response("CHANGE_PASSWORD_ERROR:Server failed!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            thread.response("CHANGE_PASSWORD_ERROR:Server failed!");
+        }
+    }
+
+    private void changeInformation(String[] data) {
+        try {
+            AccountBLL service = new AccountBLL();
+            Account account = thread.getAccount();
+
+            account.setEmail(data[0]);
+            account.setFullname(data[1]);
+            account.setGender(Integer.parseInt(data[2]));
+            account.setBirthday(data[3]);
+
+            String error = service.validateInfo(account);
+
+            if (error.equals("")) {
+                service.update(account);
+                thread.response("UPDATE_OK:" + account.toString());
+            } else {
+                thread.response("UPDATE_ERROR" + error);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void handleRequest(String command, String[] data) {
         switch (command) {
@@ -104,6 +152,14 @@ public class AccountHandler extends HandlerBase {
             }
             case "LOGIN": {
                 login(data);
+                break;
+            }
+            case "UPDATE": {
+                changeInformation(data);
+                break;
+            }
+            case "CHANGE_PASSWORD": {
+                changePassword(data);
                 break;
             }
             case "READY": {
