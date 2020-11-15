@@ -12,42 +12,40 @@ public class AchievementBLL {
 		int win = 0;
 		int lose = 0;
 		int draw = 0;
-		int longestWinChain = 0;
-		int longestLoseChain = 0;
-		int chainCounter = 0;
+		int longestWinStreak = 0;
+		int longestLoseStreak = 0;
+		int streakCounter = 1;
 		int prevItem = -1;
 
 		for (MatchHistory h : histories) {
 			int status = h.getStatus().getValue();
 
-			if (prevItem == -1) {
-				chainCounter = 1;
-				prevItem = status;
-			}
-
-			if (status != prevItem) {
-				switch (status) {
+			if (status == prevItem) {
+				streakCounter++;
+			} else {
+				switch (prevItem) {
 					case 0: {
-						if (chainCounter > longestWinChain) {
-							longestWinChain = chainCounter;
+						if (streakCounter > longestWinStreak) {
+							longestWinStreak = streakCounter;
 						}
 
 						break;
 					}
 					case 1: {
-						if (chainCounter > longestLoseChain) {
-							longestLoseChain = chainCounter;
+						if (streakCounter > longestLoseStreak) {
+							longestLoseStreak = streakCounter;
 						}
 
 						break;
 					}
 				}
 
-				chainCounter = 1;
+				streakCounter = 1;
 			}
 
 			prevItem = status;
 
+			// Count match
 			switch (status) {
 				case 0: {
 					win++;
@@ -64,6 +62,24 @@ public class AchievementBLL {
 			}
 		}
 
-		return new Achievement(playerId, win, lose, draw, longestWinChain, longestLoseChain);
+		// Check final item
+		switch (prevItem) {
+			case 0: {
+				if (streakCounter > longestWinStreak) {
+					longestWinStreak = streakCounter;
+				}
+
+				break;
+			}
+			case 1: {
+				if (streakCounter > longestLoseStreak) {
+					longestLoseStreak = streakCounter;
+				}
+
+				break;
+			}
+		}
+
+		return new Achievement(playerId, win, lose, draw, longestWinStreak, longestLoseStreak);
 	}
 }

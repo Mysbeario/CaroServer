@@ -3,8 +3,10 @@ package caroserver.handler;
 import caroserver.Server;
 import java.security.NoSuchAlgorithmException;
 import caroserver.bll.AccountBLL;
+import caroserver.bll.AchievementBLL;
 import caroserver.component.MatchMaker;
 import caroserver.model.Account;
+import caroserver.model.Achievement;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,10 +17,10 @@ public class AccountHandler extends HandlerBase {
         try {
             AccountBLL service = new AccountBLL();
             String email = data[0];
-            String password = data[1];
-            String fullname = data[2];
-            int gender = Integer.parseInt(data[3]);
-            String birthday = data[4];
+            String fullname = data[1];
+            int gender = Integer.parseInt(data[2]);
+            String birthday = data[3];
+            String password = data[4];
             if (service.getByEmail(email) != null) {
                 thread.response("REGISTER_ERROR:Duplicated email!");
             } else {
@@ -73,6 +75,17 @@ public class AccountHandler extends HandlerBase {
         thread.response("GAME_LIST:" + (gameInfos.isEmpty() ? ";" : String.join(";", gameInfos)));
     }
 
+    private void getAchievement(String playerId) {
+        try {
+            AchievementBLL service = new AchievementBLL();
+            Achievement achi = service.get(playerId);
+
+            thread.response("ACHIEVEMENT:" + achi.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void readyAccount(String[] data) {
         if (!Server.isQueueEmpty()) {
             new MatchMaker(thread, Server.dequeueAccount());
@@ -103,6 +116,10 @@ public class AccountHandler extends HandlerBase {
             }
             case "REFRESH": {
                 getGameList();
+                break;
+            }
+            case "ACHIEVEMENT": {
+                getAchievement(data[0]);
                 break;
             }
         }

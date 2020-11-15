@@ -204,7 +204,7 @@ public class Game {
 		}
 	}
 
-	public void calculateScore() {
+	public void calculateScore(String winningPlayerId) {
 		try {
 			MatchHistoryBLL historyService = new MatchHistoryBLL();
 			AccountBLL accountService = new AccountBLL();
@@ -216,7 +216,7 @@ public class Game {
 				if (isDraw) {
 					account.setScore(account.getScore() + 1);
 					history.setStatus(MatchStatus.DRAW);
-				} else if (getCurrentPlayerId().equals(account.getId())) {
+				} else if (winningPlayerId.equals(account.getId())) {
 					account.setScore(account.getScore() + 3);
 					history.setStatus(MatchStatus.WIN);
 				} else {
@@ -233,7 +233,7 @@ public class Game {
 	}
 
 	public void gameOver(String winningPlayerId) {
-		calculateScore();
+		calculateScore(winningPlayerId);
 		sendAll("GAMEOVER:" + (isDraw ? "DRAW" : winningPlayerId));
 		turnTimer.interrupt();
 		gameTimer.interrupt();

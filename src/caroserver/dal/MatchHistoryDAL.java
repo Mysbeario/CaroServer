@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import caroserver.model.MatchHistory;
 import caroserver.model.MatchHistory.MatchStatus;
@@ -16,7 +15,7 @@ public class MatchHistoryDAL {
 
 		history.setPlayerId(result.getString("playerId"));
 		history.setStatus(MatchStatus.values()[result.getInt("status")]);
-		history.setDate(new Date(result.getString("date")));
+		history.setDate(result.getString("date"));
 
 		return history;
 	}
@@ -29,7 +28,7 @@ public class MatchHistoryDAL {
 
 			stmt.setString(1, history.getPlayerId());
 			stmt.setInt(2, history.getStatus().getValue());
-			stmt.setString(3, history.getDate().toString());
+			stmt.setString(3, history.getDate());
 
 			stmt.executeUpdate();
 			conn.close();

@@ -101,7 +101,7 @@ public class AccountDAL {
 		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ? WHERE id = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
-		stmt.setString(10, account.getId());
+		stmt.setString(7, account.getId());
 		stmt.setString(1, account.getEmail());
 		stmt.setString(2, account.getPassword());
 		stmt.setString(3, account.getFullname());

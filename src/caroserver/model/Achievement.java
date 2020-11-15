@@ -4,17 +4,17 @@ public class Achievement {
 	private int win;
 	private int lose;
 	private int draw;
-	private int longestWinChain;
-	private int longestLoseChain;
+	private int longestWinStreak;
+	private int longestLoseStreak;
 	private String playerId;
 
-	public Achievement(String playerId, int win, int lose, int draw, int longestWinChain, int longestLoseChain) {
+	public Achievement(String playerId, int win, int lose, int draw, int longestWinStreak, int longestLoseStreak) {
 		this.playerId = playerId;
 		this.win = win;
 		this.lose = lose;
 		this.draw = draw;
-		this.longestLoseChain = longestLoseChain;
-		this.longestWinChain = longestWinChain;
+		this.longestLoseStreak = longestLoseStreak;
+		this.longestWinStreak = longestWinStreak;
 	}
 
 	public int getWin() {
@@ -33,16 +33,21 @@ public class Achievement {
 		return win + draw + lose;
 	}
 
-	public int getLongestWinChain() {
-		return longestWinChain;
+	public int getLongestWinStreak() {
+		return longestWinStreak;
 	}
 
-	public int getLongestLoseChain() {
-		return longestLoseChain;
+	public int getLongestLoseStreak() {
+		return longestLoseStreak;
 	}
 
 	public double getWinRate() {
-		return win / (getTotalGame() * 1.f);
+		if (getTotalGame() == 0) {
+			return 0;
+		}
+
+		double winRate = win / (getTotalGame() * 1.f) * 100;
+		return Math.round(winRate * 100.0) / 100.0;
 	}
 
 	public String getPlayerId() {
@@ -61,11 +66,17 @@ public class Achievement {
 		this.draw = draw;
 	}
 
-	public void setLongestWinChain(int winChain) {
-		this.longestWinChain = winChain;
+	public void setLongestWinChain(int winStreak) {
+		this.longestWinStreak = winStreak;
 	}
 
-	public void setLongestLoseChain(int loseChain) {
-		this.longestLoseChain = loseChain;
+	public void setLongestLoseChain(int loseStreak) {
+		this.longestLoseStreak = loseStreak;
+	}
+
+	public String toString() {
+		return String.join(";", Integer.toString(getWin()), Integer.toString(getLose()), Integer.toString(getDraw()),
+				Integer.toString(getLongestWinStreak()), Integer.toString(getLongestLoseStreak()),
+				Double.toString(getWinRate()));
 	}
 }

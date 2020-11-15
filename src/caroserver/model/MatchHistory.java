@@ -19,12 +19,12 @@ public class MatchHistory {
 
 	private String playerId;
 	private MatchStatus status;
-	private Date date = new Date();
+	private String date = (new Date()).toString();
 
 	public MatchHistory() {
 	}
 
-	public MatchHistory(String playerId, MatchStatus status, Date date) {
+	public MatchHistory(String playerId, MatchStatus status, String date) {
 		this.playerId = playerId;
 		this.status = status;
 		this.date = date;
@@ -42,7 +42,7 @@ public class MatchHistory {
 		return status;
 	}
 
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
 
@@ -54,7 +54,7 @@ public class MatchHistory {
 		this.status = status;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 }
