@@ -89,8 +89,20 @@ public class Server {
 
         activeAccounts.remove(id);
 
+        // Case: player is looking for match.
         if (waitingAccounts.contains(client)) {
             waitingAccounts.remove(client);
         }
+
+        // Case: player is in a game or watching a game.
+        for (Game g : games.values()) {
+            ClientThread spectator = g.getSpectator();
+            if (spectator != null && spectator.equals(client)) {
+                g.removeSpectator();
+            }
+        }
+
+        // Case: player found a match but hasn't responsed yet.
+        /* Client will send "DECLINE" signal when the application is terminated */
     }
 }

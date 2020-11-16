@@ -32,6 +32,15 @@ public class GameHandler extends HandlerBase {
 			}
 			case "READY": {
 				thread.unregisterHandler(this);
+				break;
+			}
+			case "DISCONNECT": {
+				if (game.getCurrentPlayerId().equals(thread.getAccount().getId())) {
+					game.nextTurn();
+				}
+
+				game.gameOver(game.getCurrentPlayerId());
+				break;
 			}
 		}
 	}

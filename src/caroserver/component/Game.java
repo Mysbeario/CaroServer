@@ -75,6 +75,10 @@ public class Game {
 				.response("GAME_INFO:" + playerInfos + ";" + getCurrentPlayerId() + ";" + String.join(",", moveInfos));
 	}
 
+	public void removeSpectator() {
+		spectator = null;
+	}
+
 	public void nextTurn() {
 		currentPlayer = (currentPlayer + 1) % 2;
 	}
@@ -93,6 +97,10 @@ public class Game {
 
 	public String getCurrentPlayerId() {
 		return players[currentPlayer].getAccount().getId();
+	}
+
+	public ClientThread getSpectator() {
+		return spectator;
 	}
 
 	public void resetTimer() {
@@ -253,5 +261,15 @@ public class Game {
 
 	public String getId() {
 		return id;
+	}
+
+	public boolean containPlayer(ClientThread account) {
+		for (ClientThread p : players) {
+			if (account.equals(p)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

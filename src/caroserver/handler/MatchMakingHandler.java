@@ -37,6 +37,7 @@ public class MatchMakingHandler extends HandlerBase {
 				matchMaker.checkMatch();
 				break;
 			}
+			case "DISCONNECT":
 			case "DECLINE_MATCHMAKING": {
 				declineMatch();
 				break;
