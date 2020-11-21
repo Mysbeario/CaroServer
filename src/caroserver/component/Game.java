@@ -108,12 +108,12 @@ public class Game {
 		startTurnTimer();
 	}
 
-	public boolean newMove(int col, int row, String fromPlayer) {
+	public boolean newMove(int col, int row) {
 		if (!board[row][col].equals("")) {
 			return false;
 		}
 
-		board[row][col] = fromPlayer;
+		board[row][col] = getCurrentPlayerId();
 		return true;
 	}
 

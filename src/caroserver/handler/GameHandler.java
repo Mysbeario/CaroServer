@@ -15,11 +15,11 @@ public class GameHandler extends HandlerBase {
 			case "MOVE": {
 				int col = Integer.parseInt(data[0]);
 				int row = Integer.parseInt(data[1]);
-				String fromPlayer = data[2];
+				String fromPlayer = thread.getAccount().getId();
 
-				if (game.getCurrentPlayerId().equals(fromPlayer) && game.newMove(col, row, fromPlayer)) {
+				if (game.getCurrentPlayerId().equals(fromPlayer) && game.newMove(col, row)) {
 					game.nextTurn();
-					game.sendAll(command + ":" + String.join(";", data) + ";" + game.getCurrentPlayerId());
+					game.sendAll(command + ":" + String.join(";", data[0], data[1], fromPlayer, game.getCurrentPlayerId()));
 
 					if (game.isWinning(col, row)) {
 						game.gameOver(fromPlayer);
@@ -28,6 +28,10 @@ public class GameHandler extends HandlerBase {
 					}
 				}
 
+				break;
+			}
+			case "CHAT": {
+				game.sendAll(command + ":" + data[0] + ";" + thread.getAccount().getFullname());
 				break;
 			}
 			case "READY": {
