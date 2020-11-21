@@ -9,6 +9,7 @@ import caroserver.Server;
 import caroserver.bll.AccountBLL;
 import caroserver.bll.MatchHistoryBLL;
 import caroserver.handler.GameHandler;
+import caroserver.handler.SpectatorHandler;
 import caroserver.model.Account;
 import caroserver.model.MatchHistory;
 import caroserver.model.MatchHistory.MatchStatus;
@@ -27,7 +28,7 @@ public class Game {
 	public Game(ClientThread[] players) {
 		this.players = players;
 
-		for (ClientThread p : players) {
+		for (ClientThread p : this.players) {
 			p.registerHandler(new GameHandler(this));
 		}
 
@@ -71,6 +72,7 @@ public class Game {
 		}
 
 		this.spectator = spectator;
+		this.spectator.registerHandler(new SpectatorHandler(this));
 		this.spectator
 				.response("GAME_INFO:" + playerInfos + ";" + getCurrentPlayerId() + ";" + String.join(",", moveInfos));
 	}
