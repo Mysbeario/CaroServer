@@ -10,10 +10,10 @@ import caroserver.handler.AccountHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import caroserver.thread.ClientThread;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -43,20 +43,22 @@ public class Server {
             listen();
         } catch (IOException e) {
             System.err.println(e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
 
-    private static void listen() throws IOException {
+    private static void listen() throws IOException, NoSuchAlgorithmException {
         System.out.println("Server is waiting for client...");
         while (true) {
             Socket socket = server.accept();
-            ClientThread client = new ClientThread(socket);
             String id = UUID.randomUUID().toString();
+            ClientThread client = new ClientThread(socket, id);
 
             activeAccounts.put(id, client);
             client.registerHandler(new AccountHandler());
             executor.execute(client);
-            client.response("CONNECTED:" + id);
+            client.response("CONNECTED:" + id, false);
         }
     }
 
