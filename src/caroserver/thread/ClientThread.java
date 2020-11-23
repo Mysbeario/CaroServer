@@ -82,7 +82,7 @@ public class ClientThread implements Runnable {
 
 				if (parts[0].equals("DISCONNECT")) {
 					isDisconnected = true;
-					Server.disconnectClient(data[0]);
+					Server.disconnectClient(this);
 				}
 
 				for (HandlerBase handler : handlers) {

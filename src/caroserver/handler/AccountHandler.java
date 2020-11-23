@@ -44,26 +44,24 @@ public class AccountHandler extends HandlerBase {
             AccountBLL service = new AccountBLL();
             String email = data[0];
             String password = data[1];
+            Account account = service.getByEmail(email);
 
-            if (service.getByEmail(email) == null) {
-                thread.response("LOGIN_ERROR:Login Failed");
+            if (account == null) {
+                thread.response("LOGIN_ERROR:Wrong email or password");
+            } else if (!account.getPassword().equals(service.hashPassword(password))) {
+                thread.response("LOGIN_ERROR:Wrong email or password");
+            } else if (Server.isAccountActive(email)) {
+                thread.response("LOGIN_ERROR:Account is currently logged in");
             } else {
-                Account account = service.getByEmail(email);
-
-                try {
-                    if (!account.getPassword().equals(service.hashPassword(password))) {
-                        thread.response("LOGIN_ERROR:Login Failed");
-                    } else {
-                        thread.setAccount(account);
-                        thread.response("LOGIN_OK:" + account.toString());
-                    }
-                } catch (NoSuchAlgorithmException e) {
-                    thread.response("LOGIN_ERROR:Server failed!");
-                }
+                thread.setAccount(account);
+                Server.addActiveAccount(thread);
+                thread.response("LOGIN_OK:" + account.toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
             thread.response("LOGIN_ERROR:Server failed!");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
 

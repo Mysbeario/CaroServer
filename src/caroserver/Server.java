@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import caroserver.thread.ClientThread;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -28,7 +30,7 @@ public class Server {
     private static ExecutorService executor;
     private static ServerSocket server;
     private static Queue<ClientThread> waitingAccounts = new LinkedList<>();
-    private static Map<String, ClientThread> activeAccounts = new HashMap<>();
+    private static ArrayList<ClientThread> activeAccounts = new ArrayList<>();
     private static int port;
     private static Map<String, Game> games = new HashMap<>();
 
@@ -55,7 +57,6 @@ public class Server {
             String id = UUID.randomUUID().toString();
             ClientThread client = new ClientThread(socket, id);
 
-            activeAccounts.put(id, client);
             client.registerHandler(new AccountHandler());
             executor.execute(client);
             client.response("CONNECTED:" + id, false);
@@ -86,14 +87,26 @@ public class Server {
         return games;
     }
 
-    public static void disconnectClient(String id) {
-        ClientThread client = activeAccounts.get(id);
+    public static void addActiveAccount(ClientThread clientThread) {
+        activeAccounts.add(clientThread);
+    }
 
-        activeAccounts.remove(id);
+    public static boolean isAccountActive(String email) {
+        for (ClientThread cl : activeAccounts) {
+            if (cl.getAccount().getEmail().equals(email)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void disconnectClient(ClientThread clientThread) {
+        activeAccounts.remove(clientThread);
 
         // Case: player is looking for match.
-        if (waitingAccounts.contains(client)) {
-            waitingAccounts.remove(client);
+        if (waitingAccounts.contains(clientThread)) {
+            waitingAccounts.remove(clientThread);
         }
 
         // Case: player found a match but hasn't responsed yet.
