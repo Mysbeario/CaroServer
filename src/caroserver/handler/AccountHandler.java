@@ -118,6 +118,15 @@ public class AccountHandler extends HandlerBase {
         }
     }
 
+    private void getRanking(String rankBy) {
+        try {
+            AchievementBLL service = new AchievementBLL();
+            thread.response("RANK:" + String.join(";", service.rank(rankBy)));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void changeInformation(String[] data) {
         try {
             AccountBLL service = new AccountBLL();
@@ -174,6 +183,10 @@ public class AccountHandler extends HandlerBase {
             }
             case "ACHIEVEMENT": {
                 getAchievement(data[0]);
+                break;
+            }
+            case "RANK": {
+                getRanking(data[0]);
                 break;
             }
         }
