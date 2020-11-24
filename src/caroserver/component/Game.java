@@ -1,8 +1,11 @@
 package caroserver.component;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 
 import caroserver.Server;
@@ -13,7 +16,7 @@ import caroserver.handler.SpectatorHandler;
 import caroserver.model.Account;
 import caroserver.model.MatchHistory;
 import caroserver.model.MatchHistory.MatchStatus;
-import caroserver.thread.ClientThread;
+import caroserver.ClientThread;
 
 public class Game {
 	private ClientThread[] players = new ClientThread[2];
@@ -24,6 +27,7 @@ public class Game {
 	private Thread gameTimer;
 	private boolean isDraw = false;
 	private String id = UUID.randomUUID().toString();
+	private long elapsedTime = 0;
 
 	public Game(ClientThread[] players) {
 		this.players = players;
@@ -44,12 +48,19 @@ public class Game {
 		int duration = 10 * 60 * 1000;
 
 		gameTimer = new Thread(() -> {
+			long startTime = System.currentTimeMillis();
+			long endTime;
+
 			try {
 				Thread.sleep(duration);
 				isDraw = true;
 				gameOver(null);
 			} catch (InterruptedException e) {
 			}
+
+			endTime = System.currentTimeMillis();
+			elapsedTime = endTime - startTime;
+			logToFile();
 		});
 
 		gameTimer.start();
@@ -273,5 +284,24 @@ public class Game {
 		}
 
 		return false;
+	}
+
+	public void logToFile() {
+		try {
+			FileWriter writer = new FileWriter("game_log.txt", true);
+			String info = "";
+
+			for (ClientThread p : players) {
+				info += p.getAccount().getFullname() + ",";
+			}
+
+			info += new Date().toString() + ",";
+			info += elapsedTime + System.getProperty("line.separator");
+
+			writer.write(info);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

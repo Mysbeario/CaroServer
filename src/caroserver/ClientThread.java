@@ -1,4 +1,4 @@
-package caroserver.thread;
+package caroserver;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
-import caroserver.Server;
 import caroserver.handler.HandlerBase;
 import caroserver.model.Account;
 

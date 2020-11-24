@@ -13,7 +13,6 @@ import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import caroserver.thread.ClientThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +37,16 @@ public class Server {
         Server.port = port;
     }
 
+    public static int countOnlineAccount() {
+        return activeAccounts.size();
+    }
+
     public static void start() {
         try {
+            AdminConsole adminConsole = new AdminConsole();
             server = new ServerSocket(port);
             executor = Executors.newCachedThreadPool();
+            executor.execute(adminConsole);
             listen();
         } catch (IOException e) {
             System.err.println(e.getMessage());

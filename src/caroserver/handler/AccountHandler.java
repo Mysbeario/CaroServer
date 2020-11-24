@@ -5,6 +5,7 @@ import caroserver.Server;
 import java.security.NoSuchAlgorithmException;
 import caroserver.bll.AccountBLL;
 import caroserver.bll.AchievementBLL;
+import caroserver.component.Game;
 import caroserver.component.MatchMaker;
 import caroserver.model.Account;
 import caroserver.model.Achievement;
@@ -50,6 +51,8 @@ public class AccountHandler extends HandlerBase {
                 thread.response("LOGIN_ERROR:Wrong email or password");
             } else if (!account.getPassword().equals(service.hashPassword(password))) {
                 thread.response("LOGIN_ERROR:Wrong email or password");
+            } else if (account.isBlocked()) {
+                thread.response("LOGIN_ERROR:Account is blocked");
             } else if (Server.isAccountActive(email)) {
                 thread.response("LOGIN_ERROR:Account is currently logged in");
             } else {
@@ -174,7 +177,13 @@ public class AccountHandler extends HandlerBase {
                 break;
             }
             case "SPECTATE": {
-                Server.getGameList().get(data[0]).addSpectator(thread);
+                Game game = Server.getGameList().get(data[0]);
+
+                if (game == null) {
+                    thread.response("ROOM_NOT_FOUND:Room not found");
+                } else {
+                    game.addSpectator(thread);
+                }
                 break;
             }
             case "REFRESH": {

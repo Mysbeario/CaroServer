@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import caroserver.model.MatchHistory;
@@ -53,5 +54,14 @@ public class MatchHistoryDAL {
 
 		conn.close();
 		return matchHistories;
+	}
+
+	public static String getMostWin() throws SQLException {
+		Connection conn = Database.connect();
+		String query = "SELECT playerId, COUNT(*) AS win FROM history WHERE status = 0 GROUP BY playerId order by win desc limit 1";
+		Statement stmt = conn.createStatement();
+		ResultSet result = stmt.executeQuery(query);
+
+		return result.getString(1);
 	}
 }

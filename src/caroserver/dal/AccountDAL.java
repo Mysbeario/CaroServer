@@ -20,6 +20,7 @@ public class AccountDAL {
 		acc.setGender(result.getInt("gender"));
 		acc.setBirthday(result.getString("birthday"));
 		acc.setScore(result.getInt("score"));
+		acc.setIsBlocked(result.getBoolean("isBlocked"));
 
 		return acc;
 	}
@@ -27,7 +28,7 @@ public class AccountDAL {
 	public static void create(Account account) {
 		try {
 			Connection conn = Database.connect();
-			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO account(id, email, password, fullname, gender, birthday, score, isBlocked) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, account.getId());
@@ -37,6 +38,7 @@ public class AccountDAL {
 			stmt.setInt(5, account.getGender());
 			stmt.setString(6, account.getBirthday());
 			stmt.setInt(7, account.getScore());
+			stmt.setBoolean(8, account.isBlocked());
 
 			stmt.executeUpdate();
 			conn.close();
@@ -98,18 +100,28 @@ public class AccountDAL {
 
 	public static void update(Account account) throws SQLException {
 		Connection conn = Database.connect();
-		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ? WHERE id = ?";
+		String query = "UPDATE account SET email = ?, password = ?, fullname = ?, gender = ?, birthday = ?, score = ?, isBlocked = ? WHERE id = ?";
 		PreparedStatement stmt = conn.prepareStatement(query);
 
-		stmt.setString(7, account.getId());
+		stmt.setString(8, account.getId());
 		stmt.setString(1, account.getEmail());
 		stmt.setString(2, account.getPassword());
 		stmt.setString(3, account.getFullname());
 		stmt.setInt(4, account.getGender());
 		stmt.setString(5, account.getBirthday());
 		stmt.setInt(6, account.getScore());
+		stmt.setBoolean(7, account.isBlocked());
 
 		stmt.executeUpdate();
 		conn.close();
+	}
+
+	public static int count() throws SQLException {
+		Connection conn = Database.connect();
+		String query = "SELECT COUNT(*) FROM account";
+		Statement stmt = conn.createStatement();
+		ResultSet result = stmt.executeQuery(query);
+
+		return result.getInt(1);
 	}
 }

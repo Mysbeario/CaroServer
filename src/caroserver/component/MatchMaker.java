@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import caroserver.Server;
 import caroserver.handler.MatchMakingHandler;
-import caroserver.thread.ClientThread;
+import caroserver.ClientThread;
 
 public class MatchMaker {
 	private ClientThread[] pair = new ClientThread[2];

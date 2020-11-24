@@ -89,4 +89,8 @@ public class AccountBLL {
     public void update(Account account) throws SQLException {
         AccountDAL.update(account);
     }
+
+    public int getTotalAccounts() throws SQLException {
+        return AccountDAL.count();
+    }
 }

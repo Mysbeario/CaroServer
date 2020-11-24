@@ -24,52 +24,28 @@ public class AchievementBLL {
 		achievements.sort(new Comparator<Achievement>() {
 			@Override
 			public int compare(Achievement a, Achievement b) {
-				switch (rankBy) {
-					case "score": {
-						try {
-							int aScore = accountService.getById(a.getPlayerId()).getScore();
-							int bScore = accountService.getById(b.getPlayerId()).getScore();
+				try {
+					int aScore = accountService.getById(a.getPlayerId()).getScore();
+					int bScore = accountService.getById(b.getPlayerId()).getScore();
+					double aRating = aScore + a.getWinRate() * (a.getTotalGame() <= 10 ? 0 : a.getWinRate())
+							+ a.getLongestWinStreak();
+					double bRating = bScore + b.getWinRate() * (b.getTotalGame() <= 10 ? 0 : b.getWinRate())
+							+ b.getLongestWinStreak();
 
-							return aScore > bScore ? -1 : 1;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-
-						return 0;
-					}
-					case "rate": {
-						return a.getWinRate() > b.getWinRate() ? -1 : 1;
-					}
-					case "streak": {
-						return a.getLongestWinStreak() > b.getLongestWinStreak() ? -1 : 1;
-					}
-					default: {
-						return 0;
-					}
+					return aRating > bRating ? -1 : 1;
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
+
+				return 0;
 			}
 		});
 
 		for (int i = 0; i < achievements.size(); i++) {
 			Achievement achi = achievements.get(i);
 			String info = (i + 1) + ",";
-			info += accountService.getById(achi.getPlayerId()).getFullname() + ",";
 
-			switch (rankBy) {
-				case "score": {
-					info += accountService.getById(achi.getPlayerId()).getScore();
-					break;
-				}
-				case "rate": {
-					info += achi.getWinRate() + "%";
-					break;
-				}
-				case "streak": {
-					info += achi.getLongestWinStreak();
-					break;
-				}
-			}
-
+			info += accountService.getById(achi.getPlayerId()).getFullname();
 			result.add(info);
 		}
 

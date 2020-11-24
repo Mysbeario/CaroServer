@@ -10,6 +10,7 @@ public class Account {
 	private int gender;
 	private String birthday;
 	private int score = 0;
+	private boolean isBlocked = false;
 
 	public Account() {
 	}
@@ -21,6 +22,10 @@ public class Account {
 		this.fullname = fullname;
 		this.gender = gender;
 		this.birthday = birthday;
+	}
+
+	public boolean isBlocked() {
+		return isBlocked;
 	}
 
 	public String getId() {
@@ -77,6 +82,10 @@ public class Account {
 
 	public void setScore(int score) {
 		this.score = score < 0 ? 0 : score;
+	}
+
+	public void setIsBlocked(boolean isBlocked) {
+		this.isBlocked = isBlocked;
 	}
 
 	public String toString() {

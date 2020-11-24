@@ -1,6 +1,6 @@
 package caroserver.handler;
 
-import caroserver.thread.ClientThread;
+import caroserver.ClientThread;
 
 public abstract class HandlerBase {
 	protected ClientThread thread;
