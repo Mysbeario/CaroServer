@@ -69,7 +69,9 @@ public class Server {
     }
 
     public static void queueAccount(ClientThread thread) {
-        waitingAccounts.add(thread);
+        if (!waitingAccounts.contains(thread)) {
+            waitingAccounts.add(thread);
+        }
     }
 
     public static ClientThread dequeueAccount() {
@@ -78,6 +80,10 @@ public class Server {
 
     public static boolean isQueueEmpty() {
         return waitingAccounts.isEmpty();
+    }
+
+    public static boolean isWaiting(ClientThread thread) {
+        return waitingAccounts.contains(thread);
     }
 
     public static void addGame(Game game) {

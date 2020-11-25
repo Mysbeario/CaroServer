@@ -89,7 +89,7 @@ public class AccountHandler extends HandlerBase {
     }
 
     private void readyAccount(String[] data) {
-        if (!Server.isQueueEmpty()) {
+        if (!Server.isQueueEmpty() && !Server.isWaiting(thread)) {
             new MatchMaker(thread, Server.dequeueAccount());
         } else {
             Server.queueAccount(thread);
